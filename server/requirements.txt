@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+pydantic-settings
+sqlalchemy
+psycopg2-binary
+alembic
+firebase-admin
+aiosmtplib
+redis
+PyJWT[crypto]
+pydantic[email]
+h3
