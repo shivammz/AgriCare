@@ -49,14 +49,19 @@ async def send_otp_to_email(email: str, otp: str):
     message["Subject"] = "Your AgriCare OTP"
     message.set_content(f"Your OTP is: {otp}. It will expire in 1 hour.")
 
-    await aiosmtplib.send(
-        message,
-        hostname=Config.SMTP_HOST,
-        port=Config.SMTP_PORT,
-        # start_tls=True,
-        username=Config.EMAIL_USERNAME,
-        password=Config.EMAIL_PASSWORD
-    )
+    try:
+        await aiosmtplib.send(
+            message,
+            hostname=Config.SMTP_HOST,
+            port=Config.SMTP_PORT,
+            start_tls=True,
+            username=Config.EMAIL_USERNAME,
+            password=Config.EMAIL_PASSWORD
+        )
+        print(f"✅ OTP email sent successfully to {email}")
+    except Exception as e:
+        print(f"❌ Failed to send OTP email to {email}: {e}")
+        raise
 
 
 async def verify_email_otp(email: str, otp: str) -> bool:
