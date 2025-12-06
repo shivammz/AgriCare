@@ -25,7 +25,7 @@ async def login_via_email(request: EmailRequest, db: Session = Depends(get_db)):
         return {"message": "OTP sent successfully!"}
     except Exception as e:
         print(f"❌ Email sending failed: {e}")
-        raise HTTPException(500, f"Failed to send OTP email: {str(e)}")
+        raise HTTPException(500, "Failed to send OTP email. Please try again.")
     
 
 @login_router.post("/login/email/verify")
