@@ -1,6 +1,6 @@
 # AgriCare/server/api/auth/login.py
 
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException
 from schemas.user import EmailRequest, EmailOTPRequest, PhoneTokenRequest
 from sqlalchemy.orm import Session
 from db import get_db
@@ -14,14 +14,18 @@ from models.user import REVERSE_ROLE_MAP
 login_router = APIRouter(prefix="/api", tags=['Auth'])
 
 @login_router.post("/login/email")
-async def login_via_email(request: EmailRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+async def login_via_email(request: EmailRequest, db: Session = Depends(get_db)):
     email = request.email
     if not get_user_by_email(email, db):
         raise HTTPException(400, "Account does not exist!")
     
     otp = await check_rate_limit(email)
-    background_tasks.add_task(send_otp_to_email, email, otp)
-    return {"message": "OTP sent successfully!"}
+    try:
+        await send_otp_to_email(email, otp)
+        return {"message": "OTP sent successfully!"}
+    except Exception as e:
+        print(f"❌ Email sending failed: {e}")
+        raise HTTPException(500, f"Failed to send OTP email: {str(e)}")
     
 
 @login_router.post("/login/email/verify")
